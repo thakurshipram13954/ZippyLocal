@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZippyLocal - Hyperlocal Food & Grocery Delivery for Tier 2/3 Cities</title>
+    <meta name="description" content="Get Gwalior's local street food, sweets, and fresh daily groceries delivered to your door in 18 minutes. Optimized for low-connectivity.">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- 1. Top Promo Banner Ticker -->
+    <div class="promo-banner" id="promo-banner">
+        <span class="live-indicator"></span>
+        <span>🎉 LAUNCH SPECIAL: Use code <strong>ZIPPY50</strong> to get 50% off on your first order!</span>
+        <button class="close-promo" onclick="dismissPromoBanner()">×</button>
+    </div>
+
+    <!-- 2. Sticky Glassmorphic Header & Location Hub -->
+    <header>
+        <div class="navbar-top-row">
+            <a href="#" class="logo-container">
+                <div class="logo-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                </div>
+                <h1 class="logo-text">Zippy<span>Local</span></h1>
+            </a>
+        </div>
+
+        <div class="location-bar-row">
+            <div class="location-hub">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span>Select Town:</span>
+                <select id="city-select">
+                    <option value="Gwalior">Gwalior</option>
+                    <option value="Jhansi">Jhansi</option>
+                    <option value="Indore">Indore</option>
+                    <option value="Patna">Patna</option>
+                </select>
+                <select id="area-select">
+                    <!-- Hydrated dynamically by JS -->
+                </select>
+            </div>
+
+            <button class="detect-location-btn" id="detect-btn" onclick="detectMyLocation()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+                Detect My Location
+            </button>
+        </div>
+
+        <div class="nav-actions" id="auth-nav-container">
+            <button class="auth-btn" onclick="toggleAuthModal()">Login / Signup</button>
+        </div>
+    </header>
+
+    <!-- Network / Low-Connectivity Quick Banner Indicator -->
+    <div class="network-indicator-bar">
+        <div class="net-speed-tag high-speed" id="net-speed-indicator">
+            <span class="speed-dot"></span>
+            5G Active
+        </div>
+        <div id="net-details-text">High performance assets serving.</div>
+        <div class="connectivity-toggle-container">
+            <span>Low Connectivity Mode (2G)</span>
+            <label class="switch">
+                <input type="checkbox" onchange="toggleLowConnectivityMode(this)">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <!-- 3. Hero & Local Value Prop Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-tagline">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                Bringing Local Favorites Home
+            </div>
+            <h2 class="hero-title">Aapki City Ka <span>Famous Khana</span> &amp; Groceries, Delivered Fast!</h2>
+            <p class="hero-desc">Connecting Tier-2 &amp; 3 communities directly with neighborhood mandi vendors, sweets outlets, and popular cafes through our optimized rider shortcut routes.</p>
+            
+            <!-- Real-time search engine -->
+            <div class="search-container">
+                <div class="search-bar-wrapper">
+                    <div class="search-input-box-wrap" style="flex: 1; display: flex; align-items: center;">
+                        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input type="text" class="search-input" id="search-input" placeholder="Search Samosa, Chicken Biryani, Potatoes, Milk...">
+                    </div>
+                    <button class="search-btn">Find Food</button>
+                </div>
+                
+                <!-- Autocomplete results dropdown -->
+                <div class="search-results-dropdown" id="search-results">
+                    <!-- Filled by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Quick searches tags -->
+            <div class="quick-tags">
+                <span>Popular:</span>
+                <span class="quick-tag" onclick="searchTag('Biryani')">Biryani</span>
+                <span class="quick-tag" onclick="searchTag('Samosa')">Samosa Chaat</span>
+                <span class="quick-tag" onclick="searchTag('Tomatoes')">Mandi Tomatoes</span>
+                <span class="quick-tag" onclick="searchTag('Milk')">Milk &amp; Eggs</span>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="hero-main-img-wrapper">
+                <img class="hero-main-img" src="assets/hero_food_grocery.png" alt="ZippyLocal Food and Groceries Showcase">
+                
+                <!-- Floating Glassmorphic Details -->
+                <div class="hero-glass-card hero-card-1">
+                    <div class="hero-card-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                    </div>
+                    <div class="hero-card-info">
+                        <h4>18 Min Delivery</h4>
+                        <p>Optimized dispatch routes</p>
+                    </div>
+                </div>
+
+                <div class="hero-glass-card hero-card-2">
+                    <div class="hero-card-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <div class="hero-card-info">
+                        <h4>100% Hygenic</h4>
+                        <p>Verified Local Legends</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Market Switching Tabs (Food vs Groceries) -->
+    <div class="market-switcher-container">
+        <div class="market-tabs">
+            <button class="market-tab active" data-market="food">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                Local Restaurants
+            </button>
+            <button class="market-tab" data-market="grocery">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+                </svg>
+                Ghar Bazaar (Groceries)
+            </button>
+        </div>
+    </div>
+
+    <!-- 5. Flash Sales & "Cheapest Deals" Priority Section -->
+    <section>
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Cheapest Deals of the <span>Day ⚡</span></h2>
+                <p class="section-subtitle">Lowest pricing on staples and daily items. Instant delivery.</p>
+            </div>
+        </div>
+
+        <!-- Horizontal scroll row -->
+        <div class="flash-sales-row" id="flash-sales-grid">
+            <!-- Hydrated dynamically by JS -->
+        </div>
+    </section>
+
+    <!-- 6. Main Catalog Categories & Listings Grid -->
+    <section style="background-color: var(--bg-charcoal); border-top: 1px solid var(--glass-border);">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title" id="catalog-title">Hot &amp; Fresh <span>Restaurant Dishes</span></h2>
+                <p class="section-subtitle">Quick bites from trusted vendors surrounding Gwalior Ward divisions.</p>
+            </div>
+        </div>
+
+        <div class="categories-container">
+            <span class="category-chip active">All Items</span>
+            <span class="category-chip">Best Sellers</span>
+            <span class="category-chip">Mouth Watering Deals</span>
+            <span class="category-chip">Local Legends Only</span>
+        </div>
+
+        <div class="category-grid-items" id="catalog-grid">
+            <!-- Hydrated dynamically by JS -->
+        </div>
+    </section>
+
+    <!-- 7. Interactive Backend Architecture & Routing Simulators -->
+    <section>
+        <div class="section-header" style="justify-content: center; text-align: center; margin-bottom: 32px;">
+            <div>
+                <h2 class="section-title">Backend Architecture <span>Simulators</span></h2>
+                <p class="section-subtitle">Interact with our low-connectivity queuing engine and real-time rider routing mapping.</p>
+            </div>
+        </div>
+
+        <div class="simulator-section">
+            
+            <!-- Panel A: Low-Connectivity Queuing Simulator -->
+            <div class="simulator-card">
+                <div class="simulator-header">
+                    <h3 class="sim-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-orange)" stroke-width="2.5">
+                            <path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.58 16.14a7 7 0 0 1 6.84 0M12 20h.01"/>
+                        </svg>
+                        2G Offline Order Engine
+                    </h3>
+                    <span class="sim-badge">Network System</span>
+                </div>
+                
+                <p style="font-size:0.85rem; color:var(--text-secondary);">Simulates how the app functions during total signal loss. Enable "Low Connectivity Mode" at the top banner, add items to cart, checkout, and watch orders enqueue locally until connectivity returns.</p>
+                
+                <!-- Display status bullet list -->
+                <div id="net-status-details">
+                    <!-- Hydrated dynamically by JS -->
+                </div>
+
+                <div class="offline-queue-panel">
+                    <div class="offline-queue-title">Offline Order Queue (IndexedDB Simulation)</div>
+                    <div class="offline-queue-list" id="offline-queue-list">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <div class="sim-actions">
+                    <button class="sim-btn" onclick="syncOfflineOrders()">🔄 Sync Queue to Backend</button>
+                    <span style="font-size:0.75rem; color:var(--text-secondary);">Click when 5G is active</span>
+                </div>
+            </div>
+
+            <!-- Panel B: Multi-Vendor & Rider Routing Map -->
+            <div class="simulator-card">
+                <div class="simulator-header">
+                    <h3 class="sim-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2.5">
+                            <rect x="1" y="3" width="15" height="13" rx="2" ry="2"/>
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                            <circle cx="5.5" cy="18.5" r="2.5"/>
+                            <circle cx="18.5" cy="18.5" r="2.5"/>
+                        </svg>
+                        Live Rider Dispatch Tracker
+                    </h3>
+                    <span class="sim-badge">Routing Algorithm</span>
+                </div>
+
+                <p style="font-size:0.85rem; color:var(--text-secondary);">Simulates multi-vendor order matching and optimized delivery routing. Highlights shortcuts avoiding railway barriers.</p>
+
+                <!-- Interactive SVG Map Canvas -->
+                <div class="map-canvas-container">
+                    <svg class="rider-route-map" viewBox="0 0 350 200">
+                        <!-- Custom grid/roads representation -->
+                        <path d="M40 140 L130 60 L240 140" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+                        <!-- Shortcut route bypassed -->
+                        <path d="M40 140 L135 140 L240 140" fill="none" stroke="var(--accent-orange)" stroke-width="2" stroke-dasharray="4 4" style="opacity: 0.7;"/>
+                        <text x="135" y="155" fill="var(--accent-orange)" font-size="8" text-anchor="middle">Zippy Shortcut (Bypasses Overpass)</text>
+
+                        <!-- Roads line -->
+                        <path d="M40 140 L130 60 L240 140" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
+                        
+                        <!-- Map Hub Nodes -->
+                        <!-- 1. Rider Hub / Base -->
+                        <circle cx="40" cy="140" r="8" fill="#1f2330" stroke="var(--text-secondary)" stroke-width="2"/>
+                        <circle cx="40" cy="140" r="3" fill="var(--text-secondary)"/>
+                        <text x="40" y="162" fill="var(--text-secondary)" font-size="9" text-anchor="middle" font-weight="bold">Rider Hub</text>
+
+                        <!-- 2. Restaurant Kitchen -->
+                        <circle cx="130" cy="60" r="10" fill="#1f2330" stroke="var(--accent-orange)" stroke-width="2" id="node-step2"/>
+                        <circle cx="130" cy="60" r="4" fill="var(--accent-orange)"/>
+                        <text x="130" y="45" fill="var(--text-primary)" font-size="9" text-anchor="middle" font-weight="bold">Sardar Ji Kitchen</text>
+
+                        <!-- 3. Customer Home -->
+                        <circle cx="240" cy="140" r="10" fill="#1f2330" stroke="var(--accent-mint)" stroke-width="2" id="node-step4"/>
+                        <polygon points="240 135 245 142 235 142" fill="var(--accent-mint)"/>
+                        <text x="240" y="162" fill="var(--text-primary)" font-size="9" text-anchor="middle" font-weight="bold">Your Home (Hazira)</text>
+
+                        <!-- Rider Scooter Dot -->
+                        <g id="rider-dot" class="rider-dot-anim">
+                            <!-- Originally centered at Hub: X=40, Y=140 -->
+                            <circle cx="40" cy="140" r="11" fill="var(--accent-amber)" stroke="#000" stroke-width="1.5" style="box-shadow: 0 0 10px var(--accent-amber)"/>
+                            <!-- Inner flash bolt inside rider scooter dot -->
+                            <path d="M39 135 L35 141 L39 141 L38 145 L43 139 L39 139 Z" fill="#000"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Progress tracking steps -->
+                <div class="order-tracker-steps">
+                    <div class="order-tracker-line"></div>
+                    <div class="order-tracker-progress" id="order-prog-bar"></div>
+                    
+                    <div class="tracker-node" id="track-step1">
+                        <div class="node-dot">1</div>
+                        <span class="node-label">Accepted</span>
+                    </div>
+                    <div class="tracker-node" id="track-step2">
+                        <div class="node-dot">2</div>
+                        <span class="node-label">Cooking</span>
+                    </div>
+                    <div class="tracker-node" id="track-step3">
+                        <div class="node-dot">3</div>
+                        <span class="node-label">Transit</span>
+                    </div>
+                    <div class="tracker-node" id="track-step4">
+                        <div class="node-dot">4</div>
+                        <span class="node-label">Arrived</span>
+                    </div>
+                </div>
+
+                <div class="multi-vendor-details" id="vendor-sim-details">
+                    <div class="vendor-details-title">Simulator Telemetry Status</div>
+                    <div>Press "Simulate Delivery Route" below to trigger.</div>
+                </div>
+
+                <div class="sim-actions">
+                    <div class="telemetry-row">
+                        <div class="telemetry-item">Speed: <span id="telemetry-speed">0 km/h</span></div>
+                        <div class="telemetry-item">Distance: <span id="telemetry-dist">1.8 km</span></div>
+                        <div class="telemetry-item">ETA: <span id="telemetry-eta">15 mins</span></div>
+                    </div>
+                    <button class="sim-btn" id="start-sim-btn" onclick="triggerRiderRouteSim()">⚡ Simulate Route</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 8. Tier-2/3 Trust Factors & Social Proof -->
+    <section class="trust-section">
+        <div class="section-header" style="justify-content: center; text-align: center;">
+            <div>
+                <h2 class="section-title">Trusted by Gwalior's <span>Local Community</span></h2>
+                <p class="section-subtitle">Hear reviews from verified residents inside Gwalior and Jhansi districts.</p>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">18 Mins</div>
+                <div class="stat-label">Average Delivery Time</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">15+</div>
+                <div class="stat-label">Local Sweets &amp; Mandis</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">4.8★</div>
+                <div class="stat-label">Rider Behavior Rating</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">₹0</div>
+                <div class="stat-label">Platform Packing Markups</div>
+            </div>
+        </div>
+
+        <div class="reviews-grid">
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"Devi Lal Samosas are delivered hot in Hazira. Previously no platform covered our side because of the railway crossings. Zippy riders know the shortcut bypasses perfectly!"</p>
+                <div class="review-user">
+                    <div class="review-user-avatar">SR</div>
+                    <div class="review-user-info">
+                        <h5>Siddharth R.</h5>
+                        <p>Verified Customer • Gwalior</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"Cheapest deals for groceries. Mandatory eggs and milk packets reach before 7 AM daily. Best part is it loads so fast even when my Jio network drops to 2G!"</p>
+                <div class="review-user">
+                    <div class="review-user-avatar">PS</div>
+                    <div class="review-user-info">
+                        <h5>Priyanka S.</h5>
+                        <p>Verified Customer • Jhansi</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"No high delivery markup like heavy metro apps. Extremely honest local pricing. Sanchi dairy packet milk is exact MRP rate. Highly recommended for semi-urban towns."</p>
+                <div class="review-user">
+                    <div class="review-user-avatar">VK</div>
+                    <div class="review-user-info">
+                        <h5>Vijay K.</h5>
+                        <p>Verified Customer • Indore</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. Footer Section -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <a href="#" class="logo-container" style="margin-bottom:10px;">
+                    <div class="logo-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text">Zippy<span>Local</span></span>
+                </a>
+                <p>Empowering local restaurant vendors, home kitchens, and farmers in tier-2/3 cities with advanced, lightweight routing technology. Delivering joy in 18 minutes.</p>
+                <div class="footer-socials">
+                    <a href="#" class="social-icon">F</a>
+                    <a href="#" class="social-icon">T</a>
+                    <a href="#" class="social-icon">I</a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Explore Towns</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Gwalior Hub</a></li>
+                    <li><a href="#">Jhansi Hub</a></li>
+                    <li><a href="#">Indore Hub</a></li>
+                    <li><a href="#">Patna Hub</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Partner with us</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Register Restaurant</a></li>
+                    <li><a href="#">Register Ghar Mandi</a></li>
+                    <li><a href="#">Apply as Zippy Rider</a></li>
+                    <li><a href="#">Local Franchise Program</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Legal / Support</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Terms &amp; Local Laws</a></li>
+                    <li><a href="#">Refund Policy</a></li>
+                    <li><a href="#">Support Chat Bot</a></li>
+                    <li><a href="#">Contact City Franchise</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 ZippyLocal Technologies Pvt Ltd. All rights reserved.</p>
+            <p>Made with ❤️ for Indian Semi-Urban Communities.</p>
+        </div>
+    </footer>
+
+    <!-- 10. Persistent Sticky Cart CTA Pill -->
+    <div class="floating-cart-pill" id="floating-cart" onclick="toggleCartDrawer()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        <span>View Basket</span>
+        <span id="pill-subtotal">₹0</span>
+        <span class="cart-pill-count" id="pill-count">0</span>
+    </div>
+
+    <!-- 11. Sticky Side Drawer Cart Overlay & Container -->
+    <div class="cart-drawer-overlay" id="cart-overlay" onclick="toggleCartDrawer()"></div>
+    <div class="cart-drawer" id="cart-drawer">
+        
+        <div class="cart-header">
+            <h3 class="cart-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2.5">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+                Zippy Basket
+            </h3>
+            <button class="close-cart-btn" onclick="toggleCartDrawer()">×</button>
+        </div>
+
+        <!-- Checkout flow progress tags -->
+        <div class="checkout-progress">
+            <span class="checkout-step active" id="step-cart">1. Review Items</span>
+            <span class="checkout-step" id="step-address">2. Delivery Gate</span>
+            <span class="checkout-step" id="step-payment">3. Pay</span>
+        </div>
+
+        <!-- Main Content Area inside Cart (Items / Forms / Success) -->
+        <div class="cart-content-pane" id="cart-content">
+            <!-- Hydrated dynamically by JS -->
+        </div>
+
+        <!-- Cart Footer Checkout Actions -->
+        <div class="cart-footer" id="cart-footer">
+            <button class="checkout-btn" id="checkout-cta-btn" onclick="proceedCheckout()">
+                <span>Proceed to Checkout</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- 12. Modal Popup Window for Authentication (Simulated Mobile OTP Flow) -->
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal-box">
+            <button class="close-modal-btn" onclick="toggleAuthModal()">×</button>
+            <h3 class="modal-title">Enter Mobile Number</h3>
+            <p class="modal-subtitle">We will send a 4-digit verification code to log you in instantly.</p>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>10-Digit Mobile Number</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="text" class="form-input" disabled style="width:50px; text-align:center; font-weight:700;" value="+91">
+                    <input type="tel" class="form-input" id="auth-phone" style="flex:1;" placeholder="Enter mobile number" maxlength="10">
+                </div>
+            </div>
+
+            <button class="checkout-btn" style="width:100%;" onclick="submitMockAuth()">Get OTP</button>
+        </div>
+    </div>
+
+    <!-- Core App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
