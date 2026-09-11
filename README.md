@@ -61,7 +61,7 @@ screenshots/
 └── cart.png
 Author
 
-Your Name
+Shipram Singh
 
 BCA Student | Web Development & Python Enthusiast
 
