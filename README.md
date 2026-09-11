@@ -53,12 +53,6 @@ Database integration
 AI-powered product recommendations
 Project Preview
 
-Add screenshots of your application here:
-
-screenshots/
-├── home.png
-├── products.png
-└── cart.png
 Author
 
 Shipram Singh
